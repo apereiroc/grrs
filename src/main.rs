@@ -4,6 +4,7 @@ use clap::Parser;
 // To store the command line arguments
 // Clap knows the expected fields and their format
 // It automatically generates a help message
+// TODO: add short and long names for the inputs
 #[derive(Parser)]
 struct Cli {
     // The pattern to look for
@@ -13,7 +14,17 @@ struct Cli {
 }
 
 fn main() {
+    // Parse args
     let args = Cli::parse();
 
-    println!("pattern: {:?}, path: {:?}", args.pattern, args.path);
+    // Read the file
+    // TODO: try the BufReader approach
+    let content = std::fs::read_to_string(&args.path).expect("could not read the file");
+
+    // Iterate over the lines
+    for line in content.lines() {
+        if line.contains(&args.pattern) {
+            println!("{}", line);
+        }
+    }
 }
