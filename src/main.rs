@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use clap::Parser;
 
 // Derived from clap::Parser
@@ -13,13 +14,15 @@ struct Cli {
     path: std::path::PathBuf,
 }
 
-fn main() {
+fn main() -> Result<()> {
     // Parse args
     let args = Cli::parse();
 
     // Read the file
     // TODO: try the BufReader approach
-    let content = std::fs::read_to_string(&args.path).expect("could not read the file");
+
+    let content = std::fs::read_to_string(&args.path)
+        .with_context(|| format!("could not read file: `{}`", args.path.display()))?;
 
     // Iterate over the lines
     for line in content.lines() {
@@ -27,4 +30,5 @@ fn main() {
             println!("{}", line);
         }
     }
+    Ok(())
 }
