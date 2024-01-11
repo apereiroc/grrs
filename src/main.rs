@@ -14,6 +14,24 @@ struct Cli {
     path: std::path::PathBuf,
 }
 
+// Function to find the matches
+fn find_matches(content: &str, pattern: &str, mut writer: impl std::io::Write) {
+    // Iterate over the lines
+    for line in content.lines() {
+        if line.contains(pattern) {
+            writeln!(writer, "{}", line).unwrap();
+        }
+    }
+}
+
+// Test the function
+#[test]
+fn find_a_match() {
+    let mut result = Vec::new();
+    find_matches("Lorem ipsum\ndolor sit amet", "ipsum", &mut result);
+    assert_eq!(result, b"Lorem ipsum\n");
+}
+
 fn main() -> Result<()> {
     // Parse args
     let args = Cli::parse();
@@ -24,11 +42,7 @@ fn main() -> Result<()> {
     let content = std::fs::read_to_string(&args.path)
         .with_context(|| format!("could not read file: `{}`", args.path.display()))?;
 
-    // Iterate over the lines
-    for line in content.lines() {
-        if line.contains(&args.pattern) {
-            println!("{}", line);
-        }
-    }
+    find_matches(&content, &args.pattern, &mut std::io::stdout());
+
     Ok(())
 }
